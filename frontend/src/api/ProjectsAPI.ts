@@ -7,6 +7,27 @@ interface FetchProjectsResponse {
 
 const API_URL = 'https://waterproject-hilton-backend.azurewebsites.net/Water';
 
+export const fetchRecommendation = async (
+  articleId: string
+): Promise<FetchProjectsResponse> => {
+  try {
+    
+
+    const response = await fetch(
+      `${API_URL}/AllProjects?articleId=${articleId}`
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch projects');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching projects:', error);
+    throw error;
+  }
+};
+
 export const fetchProjects = async (
   pageSize: number,
   pageNum: number,

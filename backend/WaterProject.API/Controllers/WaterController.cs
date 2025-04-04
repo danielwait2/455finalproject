@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WaterProject.API.Data;
+using System.IO;
+using System.Linq;
 
 namespace WaterProject.API.Controllers
 {
@@ -12,31 +14,42 @@ namespace WaterProject.API.Controllers
 
         public WaterController(WaterDbContext temp) => _waterContext = temp;
 
-        [HttpGet("AllProjects")]
-        public IActionResult GetProjects(int pageSize = 10, int pageNum = 1, [FromQuery] List<string>? projectTypes = null)
+        [HttpGet("Recommendations")]
+        public IActionResult GetRecomendation(string articleId)
         {
-            var query = _waterContext.Projects.AsQueryable();
+            // Define the CSV file path. Adjust the path as needed.
+            var csvPath = "/Users/danielwait/Documents/IS_CORE/IS455/FinalAssignment/WaterProject/backend/WaterProject.API/Data/recommendations.csv";
 
-            if (projectTypes != null && projectTypes.Any())
+            if (!System.IO.File.Exists(csvPath))
             {
-                query = query.Where(p => projectTypes.Contains(p.ProjectType));
+                return NotFound(new { message = "CSV file not found." });
             }
 
-            var totalNumProjects = query.Count();
-
-            var something = query
-                .Skip((pageNum-1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
-            var someObject = new
+            var lines = System.IO.File.ReadAllLines(csvPath);
+            bool isHeader = true;
+            foreach (var line in lines)
             {
-                Projects = something,
-                TotalNumProjects = totalNumProjects
-            };
+                if (isHeader)
+                {
+                    isHeader = false;
+                    continue;
+                }
 
-            return Ok(someObject);
+                var parts = line.Split(',');
+                if (parts.Length > 0 && string.Equals(parts[0].Trim(), articleId.Trim(), StringComparison.OrdinalIgnoreCase))
+                {
+                    var recommendations = parts.Skip(1)
+                                               .Select(r => r.Trim())
+                                               .Where(r => !string.IsNullOrEmpty(r))
+                                               .ToList();
+
+                    return Ok(recommendations);
+                }
+            }
+
+            return NotFound(new { message = $"No recommendations found for articleId: {articleId}" });
         }
+        
 
         [HttpGet("GetProjectTypes")]
         public IActionResult GetProjectTypes ()
