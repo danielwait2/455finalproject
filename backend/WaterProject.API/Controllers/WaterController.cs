@@ -26,7 +26,7 @@ namespace WaterProject.API.Controllers
         public IActionResult GetContentRecomendation(string articleId)
         {
             // Define the CSV file path. Adjust the path as needed.
-            var csvPath = System.IO.Path.Combine(_env.ContentRootPath, "Data/recommendations.csv");
+            var csvPath = System.IO.Path.Combine(_env.ContentRootPath, "Data/content_recs.csv");
             Console.WriteLine("Looking for CSV file at: " + csvPath);
             if (!System.IO.File.Exists(csvPath))
             {
@@ -83,9 +83,9 @@ namespace WaterProject.API.Controllers
                 if (parts.Length > 0 && string.Equals(parts[0].Trim(), articleId.Trim(), StringComparison.OrdinalIgnoreCase))
                 {
                     var recommendations = parts.Skip(0)
-                                               .Select(r => r.Trim())
-                                               .Where(r => !string.IsNullOrEmpty(r))
-                                               .ToList();
+                                            .Select(r => r.Trim())
+                                            .Where(r => !string.IsNullOrEmpty(r))
+                                            .ToList();
 
                     return Ok(recommendations);
                 }
