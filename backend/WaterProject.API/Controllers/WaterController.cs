@@ -22,8 +22,44 @@ namespace WaterProject.API.Controllers
         }
 
 
-        [HttpGet("Recommendations")]
-        public IActionResult GetRecomendation(string articleId)
+        [HttpGet("ContentRecommendations")]
+        public IActionResult GetContentRecomendation(string articleId)
+        {
+            // Define the CSV file path. Adjust the path as needed.
+            var csvPath = System.IO.Path.Combine(_env.ContentRootPath, "Data/recommendations.csv");
+            Console.WriteLine("Looking for CSV file at: " + csvPath);
+            if (!System.IO.File.Exists(csvPath))
+            {
+                return NotFound(new { message = "CSV file not found." });
+            }
+
+            var lines = System.IO.File.ReadAllLines(csvPath);
+            bool isHeader = true;
+            foreach (var line in lines)
+            {
+                if (isHeader)
+                {
+                    isHeader = false;
+                    continue;
+                }
+
+                var parts = line.Split(',');
+                if (parts.Length > 0 && string.Equals(parts[0].Trim(), articleId.Trim(), StringComparison.OrdinalIgnoreCase))
+                {
+                    var recommendations = parts.Skip(0)
+                                               .Select(r => r.Trim())
+                                               .Where(r => !string.IsNullOrEmpty(r))
+                                               .ToList();
+
+                    return Ok(recommendations);
+                }
+            }
+
+            return NotFound(new { message = $"No recommendations found for articleId: {articleId}" });
+        }
+
+        [HttpGet("ContextRecommendations")]
+        public IActionResult GetContextRecomendation(string articleId)
         {
             // Define the CSV file path. Adjust the path as needed.
             var csvPath = System.IO.Path.Combine(_env.ContentRootPath, "Data/recommendations.csv");
