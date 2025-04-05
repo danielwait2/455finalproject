@@ -8,7 +8,6 @@ namespace WaterProject.API.Data
         {
         }
 
-        public DbSet<Project> Projects { get; set; }
         public DbSet<Recommendation> Recommendations { get; set; }
     }
 }

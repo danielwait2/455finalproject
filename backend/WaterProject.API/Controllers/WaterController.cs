@@ -95,58 +95,39 @@ namespace WaterProject.API.Controllers
         }
         
 
-        [HttpGet("GetProjectTypes")]
-        public IActionResult GetProjectTypes ()
+        [HttpGet("GetArticlesNames")]
+        public IActionResult GetArticlesNames ()
         {
-            var projectTypes = _waterContext.Projects
-                .Select(p => p.ProjectType)
-                .Distinct()
-                .ToList();
-
-            return Ok(projectTypes);
-        }
-
-        [HttpPost("AddProject")]
-        public IActionResult AddProject([FromBody] Project newProject)
-        {
-            _waterContext.Projects.Add(newProject);
-            _waterContext.SaveChanges();
-            return Ok(newProject);
-        }
-
-        [HttpPut("UpdateProject/{projectId}")]
-        public IActionResult UpdateProject(int projectId, [FromBody] Project updatedProject)
-        {
-            var existingProject = _waterContext.Projects.Find(projectId);
-
-            existingProject.ProjectName = updatedProject.ProjectName;
-            existingProject.ProjectType = updatedProject.ProjectType;
-            existingProject.ProjectRegionalProgram = updatedProject.ProjectRegionalProgram;
-            existingProject.ProjectImpact = updatedProject.ProjectImpact;
-            existingProject.ProjectPhase = updatedProject.ProjectPhase;
-            existingProject.ProjectFunctionalityStatus = updatedProject.ProjectFunctionalityStatus;
-
-            _waterContext.Projects.Update(existingProject);
-            _waterContext.SaveChanges();
-
-            return Ok(existingProject);
-        }
-
-        [HttpDelete("DeleteProject/{projectId}")]
-        public IActionResult DeleteProject(int projectId)
-        {
-            var project = _waterContext.Projects.Find(projectId);
-
-            if (project == null)
+            // Define the CSV file path. Adjust the path as needed.
+            var csvPath = System.IO.Path.Combine(_env.ContentRootPath, "Data/recommendations.csv");
+            Console.WriteLine("Looking for CSV file at: " + csvPath);
+            if (!System.IO.File.Exists(csvPath))
             {
-                return NotFound(new {message = "Project not found"});
+                return NotFound(new { message = "CSV file not found." });
             }
 
-            _waterContext.Projects.Remove(project);
-            _waterContext.SaveChanges();
+            var lines = System.IO.File.ReadAllLines(csvPath);
+            bool isHeader = true;
+            var projectNames = new List<string>();
+            
+            foreach (var line in lines)
+            {
+                if (isHeader)
+                {
+                    isHeader = false;
+                    continue;
+                }
 
-            return NoContent();
+                var parts = line.Split(',');
+                if (parts.Length > 0 && !string.IsNullOrEmpty(parts[0].Trim()))
+                {
+                    projectNames.Add(parts[0].Trim());
+                }
+            }
+
+            return Ok(projectNames);
         }
+        
 
     }
 }
