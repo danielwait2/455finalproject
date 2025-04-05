@@ -31,17 +31,7 @@ function Headlines() {
       });
   }, []);
 
-  useEffect(() => {
-    fetch(`https://localhost:5000/Water/ContentRecommendations?articleId=${articleId}`) // replace with your API URL
-      .then(response => response.json())
-      .then(data => {
-        // data is an array of strings like your example
-        setHeadlines3(data);
-      })
-      .catch(error => {
-        console.error('Error fetching headlines:', error);
-      });
-  }, []);
+
 
   return (
     <>
@@ -83,25 +73,6 @@ function Headlines() {
       </div>
     )}
   </div>
-  <div>
-  <h1>Headlines</h1>
-  {headlines3.length > 0 && (
-    <div>
-      <h2>Article</h2>
-      <p>{headlines3[0]}</p>
-    </div>
-  )}
-  {headlines3.length > 1 && (
-    <div>
-      <h2>Recommendations</h2>
-      <ul>
-        {headlines3.slice(1, 6).map((headline, index) => (
-          <ol key={index}>{index + 1}: {headline}</ol>
-        ))}
-      </ul>
-    </div>
-  )}
-</div>
 </>
   );
 }
