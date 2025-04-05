@@ -5,20 +5,18 @@ interface FetchProjectsResponse {
   totalNumProjects: number;
 }
 
-const API_URL = 'https://waterproject-hilton-backend.azurewebsites.net/Water';
+const API_URL = 'https://localhost:5000/Water';
 
 export const fetchRecommendation = async (
   articleId: string
-): Promise<FetchProjectsResponse> => {
+): Promise<string[]> => {
   try {
-    
-
     const response = await fetch(
-      `${API_URL}/AllProjects?articleId=${articleId}`
+      `${API_URL}/Recommendations?articleId=${articleId}`
     );
 
     if (!response.ok) {
-      throw new Error('Failed to fetch projects');
+      throw new Error('Failed to fetch recommendations');
     }
 
     return await response.json();

@@ -12,14 +12,22 @@ namespace WaterProject.API.Controllers
     {
         private WaterDbContext _waterContext;
 
-        public WaterController(WaterDbContext temp) => _waterContext = temp;
+        private readonly IWebHostEnvironment _env;
+
+
+        public WaterController(WaterDbContext temp, IWebHostEnvironment env)
+        {
+            _waterContext = temp;
+            _env = env;
+        }
+
 
         [HttpGet("Recommendations")]
         public IActionResult GetRecomendation(string articleId)
         {
             // Define the CSV file path. Adjust the path as needed.
-            var csvPath = "/Users/danielwait/Documents/IS_CORE/IS455/FinalAssignment/WaterProject/backend/WaterProject.API/Data/recommendations.csv";
-
+            var csvPath = System.IO.Path.Combine(_env.ContentRootPath, "Data/recommendations.csv");
+            Console.WriteLine("Looking for CSV file at: " + csvPath);
             if (!System.IO.File.Exists(csvPath))
             {
                 return NotFound(new { message = "CSV file not found." });
@@ -38,7 +46,7 @@ namespace WaterProject.API.Controllers
                 var parts = line.Split(',');
                 if (parts.Length > 0 && string.Equals(parts[0].Trim(), articleId.Trim(), StringComparison.OrdinalIgnoreCase))
                 {
-                    var recommendations = parts.Skip(1)
+                    var recommendations = parts.Skip(0)
                                                .Select(r => r.Trim())
                                                .Where(r => !string.IsNullOrEmpty(r))
                                                .ToList();

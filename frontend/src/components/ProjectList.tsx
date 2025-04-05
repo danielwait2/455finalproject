@@ -1,34 +1,45 @@
-import { useEffect, useState } from 'react';
-import { Project } from '../types/Project';
-import { useNavigate } from 'react-router-dom';
-import { fetchProjects } from '../api/ProjectsAPI';
-
+import { useState, useEffect } from 'react';
+import { fetchRecommendation } from '../api/ProjectsAPI';
+import { Recomendation } from '../types/Recomendation';
 
 function ProjectList({ selectedCategories }: { selectedCategories: string[] }) {
-  const [projects, setProjects] = useState<Project[]>([]);
-  
+  const [recommendation, setRecommendation] = useState<Recomendation | null>(null);
 
   useEffect(() => {
-    const loadProjects = async () => {
+    const loadRecommendation = async () => {
       try {
-        setLoading(true);
-        const data = await fetchProjects(pageSize, pageNum, selectedCategories);
-        setProjects(data.projects);
-        setTotalPages(Math.ceil(data.totalNumProjects / pageSize));
-      } catch (error) {
-        setError((error as Error).message);
-      } finally {
-        setLoading(false);
+        // Use the first selected category as the articleId (adjust as needed)
+        const articleId = selectedCategories[0] || '';
+        if (!articleId) {
+          return;
+        }
+        const data = await fetchRecommendation(articleId);
+        // Cast data to Recomendation to satisfy TypeScript
+        setRecommendation(data);
+      } catch (err) {
+        console.error('Error fetching recommendation:', err);
       }
     };
 
-    loadProjects();
-  }, [pageSize, pageNum, selectedCategories]);
+    loadRecommendation();
+  }, [selectedCategories]);
 
+  // Check if recommendation is null before accessing its properties
+  if (!recommendation) {
+    return <div>No recommendations available.</div>;
+  }
 
   return (
-    <>
-    </>
+    <div>
+      <h2>Recommendations for {recommendation.articleId}</h2>
+      <ul>
+        <li>{recommendation.recommendaiton1}</li>
+        <li>{recommendation.recommendaiton2}</li>
+        <li>{recommendation.recommendaiton3}</li>
+        <li>{recommendation.recommendaiton4}</li>
+        <li>{recommendation.recommendaiton5}</li>
+      </ul>
+    </div>
   );
 }
 
