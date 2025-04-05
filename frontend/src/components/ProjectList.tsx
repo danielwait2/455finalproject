@@ -1,79 +1,122 @@
 import { useState, useEffect } from 'react';
 
 function Headlines() {
-  const [headlines, setHeadlines] = useState([]);
-  const [headlines2, setHeadlines2] = useState([]);
-  const [headlines3, setHeadlines3] = useState([]);
+  // State for articles (populated from the GetArticlesNames endpoint)
+  const [articles, setArticles] = useState([]);
+  // Selected article from the dropdown; default is empty so user must select one.
+  const [selectedArticle, setSelectedArticle] = useState('');
+  // States for recommendations
+  const [contextRecs, setContextRecs] = useState([]);
+  const [contentRecs, setContentRecs] = useState([]);
 
-  const articleId = 'Uber%20lan%C3%A7a%20servi%C3%A7o%20de%20helic%C3%B3ptero%20em%20SP%20com%20pre%C3%A7os%20a%20partir%20de%20R%2466%20-%20IDG%20Now%21'; // replace with your article ID
-
+  // Fetch list of articles on component mount
   useEffect(() => {
-    fetch(`https://localhost:5000/Water/ContextRecommendations?articleId=${articleId}`) // replace with your API URL
-      .then(response => response.json())
-      .then(data => {
-        // data is an array of strings like your example
-        setHeadlines(data);
+    fetch('https://localhost:5000/Water/GetArticlesNames')
+      .then((response) => response.json())
+      .then((data) => {
+        setArticles(data);
+        // Do not auto-set a default so that the placeholder remains until the user selects one.
       })
-      .catch(error => {
-        console.error('Error fetching headlines:', error);
+      .catch((error) => {
+        console.error('Error fetching articles:', error);
       });
   }, []);
 
+  // Fetch context recommendations when selectedArticle changes
   useEffect(() => {
-    fetch(`https://localhost:5000/Water/ContentRecommendations?articleId=${articleId}`) // replace with your API URL
-      .then(response => response.json())
-      .then(data => {
-        // data is an array of strings like your example
-        setHeadlines2(data);
+    if (!selectedArticle) return;
+    fetch(
+      `https://localhost:5000/Water/ContextRecommendations?articleId=${encodeURIComponent(selectedArticle)}`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setContextRecs(data);
       })
-      .catch(error => {
-        console.error('Error fetching headlines:', error);
+      .catch((error) => {
+        console.error('Error fetching context recommendations:', error);
       });
-  }, []);
+  }, [selectedArticle]);
 
+  // Fetch content recommendations when selectedArticle changes
+  useEffect(() => {
+    if (!selectedArticle) return;
+    fetch(
+      `https://localhost:5000/Water/ContentRecommendations?articleId=${encodeURIComponent(selectedArticle)}`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setContentRecs(data);
+      })
+      .catch((error) => {
+        console.error('Error fetching content recommendations:', error);
+      });
+  }, [selectedArticle]);
 
+  // Handle dropdown change
+  const handleArticleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedArticle(e.target.value);
+  };
 
   return (
     <>
-    <div>
-      <h1>Context Recommendation for </h1>
-      {headlines.length > 0 && (
-        <div>
-          <h2>Article</h2>
-          <p>{headlines[0]}</p>
-        </div>
-      )}
-      {headlines.length > 1 && (
-        <div>
-          <h2>Recommendations</h2>
-          <ul>
-            {headlines.slice(1, 6).map((headline, index) => (
-              <ol key={index}>{index + 1}: {headline}</ol>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
-    <div>
-    <h1>Content Recomendation for</h1>
-    {headlines2.length > 0 && (
-      <div>
-        <h2>Article</h2>
-        <p>{headlines2[0]}</p>
-      </div>
-    )}
-    {headlines2.length > 1 && (
-      <div>
-        <h2>Recommendations</h2>
-        <ul>
-          {headlines2.slice(1, 6).map((headline, index) => (
-            <ol key={index}>{index + 1}: {headline}</ol>
+      {/* Dropdown with placeholder */}
+      <div className="mb-4">
+        <select
+          id="article-select"
+          className="w-full border p-2 rounded"
+          value={selectedArticle}
+          onChange={handleArticleChange}
+        >
+          <option value="">-- Select an Article --</option>
+          {articles.map((article, index) => (
+            <option key={index} value={article}>
+              {article}
+            </option>
           ))}
-        </ul>
+        </select>
       </div>
-    )}
-  </div>
-</>
+
+      {/* Flex container to display recommendations side by side */}
+      <div style={{ display: 'flex', gap: '20px' }}>
+        <div style={{ flex: 1 }}>
+          <h2>Context Recommendation</h2>
+          {contextRecs.length > 0 && (
+            <>
+              {contextRecs.length > 1 && (
+                <div>
+                  <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
+                    {contextRecs.slice(1, 6).map((rec, index) => (
+                      <li key={index}>
+                        {index + 1}: {rec}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        <div style={{ flex: 1 }}>
+          <h2>Content Recommendation</h2>
+          {contentRecs.length > 0 && (
+            <>
+              {contentRecs.length > 1 && (
+                <div>
+                  <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
+                    {contentRecs.slice(1, 6).map((rec, index) => (
+                      <li key={index}>
+                        {index + 1}: {rec}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    </>
   );
 }
 

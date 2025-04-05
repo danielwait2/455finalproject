@@ -3513,19 +3513,19 @@
     ]
   },
   "packageFolders": {
-    "/Users/danielwait/.nuget/packages/": {}
+    "/Users/jacks/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/danielwait/Documents/IS_CORE/IS455/FinalAssignment/WaterProject/backend/WaterProject.API/WaterProject.API.csproj",
+      "projectUniqueName": "/Users/jacks/Desktop/455finalproject/backend/WaterProject.API/WaterProject.API.csproj",
       "projectName": "WaterProject.API",
-      "projectPath": "/Users/danielwait/Documents/IS_CORE/IS455/FinalAssignment/WaterProject/backend/WaterProject.API/WaterProject.API.csproj",
-      "packagesPath": "/Users/danielwait/.nuget/packages/",
-      "outputPath": "/Users/danielwait/Documents/IS_CORE/IS455/FinalAssignment/WaterProject/backend/WaterProject.API/obj/",
+      "projectPath": "/Users/jacks/Desktop/455finalproject/backend/WaterProject.API/WaterProject.API.csproj",
+      "packagesPath": "/Users/jacks/.nuget/packages/",
+      "outputPath": "/Users/jacks/Desktop/455finalproject/backend/WaterProject.API/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/danielwait/.nuget/NuGet/NuGet.Config"
+        "/Users/jacks/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -3590,7 +3590,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.404/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.405/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
